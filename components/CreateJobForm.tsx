@@ -7,7 +7,7 @@ import {
   JobStatus,
   JobMode,
   CreateAndEditJobSchema,
-  CreateAndEditJobType,
+  createAndEditJobType,
 } from "@/utils/types";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 
 function CreateJobForm() {
-  const form = useForm<CreateAndEditJobType>({
+  const form = useForm<createAndEditJobType>({
     resolver: zodResolver(CreateAndEditJobSchema),
     defaultValues: {
       position: "",
@@ -36,7 +36,7 @@ function CreateJobForm() {
   const { toast } = useToast();
   const router = useRouter();
   const { mutate, isPending } = useMutation({
-    mutationFn: (values: CreateAndEditJobType) => createJobAction(values),
+    mutationFn: (values: createAndEditJobType) => createJobAction(values),
     onSuccess: (data) => {
       if (!data) {
         toast({ description: "there was an error" });
@@ -52,7 +52,7 @@ function CreateJobForm() {
     },
   });
 
-  function onSubmit(values: CreateAndEditJobType) {
+  function onSubmit(values: createAndEditJobType) {
     mutate(values);
   }
   return (
