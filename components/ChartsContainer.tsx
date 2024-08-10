@@ -18,6 +18,7 @@ function ChartsContainer() {
     queryKey: ["charts"],
     queryFn: () => getChartsDataAction(),
   });
+  console.log(data);
 
   if (!data || data.length < 1) {
     return null;

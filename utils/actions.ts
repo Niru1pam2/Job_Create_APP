@@ -20,7 +20,6 @@ function getAuthUser(): string {
 export async function createJobAction(
   values: createAndEditJobType
 ): Promise<JobType | null> {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
   const userId = getAuthUser();
   try {
     CreateAndEditJobSchema.parse(values);
@@ -84,14 +83,22 @@ export async function getAllJobsAction({
         status: jobStatus,
       };
     }
-
+    const skip = (page - 1) * limit;
     const jobs: JobType[] = await prisma.job.findMany({
       where: whereClause,
+      skip,
+      take: limit,
       orderBy: {
         createdAt: "asc",
       },
     });
-    return { jobs, count: 0, page: 1, totalPages: 0 };
+
+    const count: number = await prisma.job.count({
+      where: whereClause,
+    });
+
+    const totalPages = Math.ceil(count / limit);
+    return { jobs, count, page, totalPages };
   } catch (error) {
     return { jobs: [], count: 0, page: 1, totalPages: 0 };
   }
@@ -194,7 +201,6 @@ export async function getChartsDataAction(): Promise<
 > {
   const userId = getAuthUser();
   const sixMonthsAgo = dayjs().subtract(6, "month").toDate();
-  console.log(sixMonthsAgo);
   try {
     const jobs = await prisma.job.findMany({
       where: {
@@ -219,7 +225,6 @@ export async function getChartsDataAction(): Promise<
       }
       return acc;
     }, [] as Array<{ date: string; count: number }>);
-    console.log(applicationsPerMonth);
 
     return applicationsPerMonth;
   } catch (error) {
